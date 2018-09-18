@@ -1,2 +1,11 @@
+<<<<<<< HEAD
+!.gitignore
+mysql/*
+log/*
+=======
 .*
 !.gitignore
+mysql/*
+log/*
+.env
+>>>>>>> b55f887... 增加env支持
