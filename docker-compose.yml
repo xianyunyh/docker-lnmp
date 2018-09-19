@@ -12,7 +12,9 @@ services:
       - ${NGINX_LOG_PATH}/:/var/log/dnmp/:rw
     networks:
       - net-php
-
+    depends_on:
+      - php
+    container_name: "web_nginx"   
   php:
     build: ./php/php72/
     expose:
@@ -22,22 +24,31 @@ services:
       - ${PHP_CONF_PATH}/php.ini:/usr/local/etc/php/php.ini:ro
       - ${PHP_CONF_PATH}/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:rw
       - ${PHP_LOG_PATH}/:/var/log/dnmp/:rw
+    depends_on:
+      - mysql
+      - redis
     networks:
       - net-php
       - net-mysql
       - net-redis
-
+    extra_hosts:
+      - "redis:127.0.0.1"
+      - "mysql:127.0.0.1"
+    container_name: "web_php"
   mysql:
     image: mysql:8.0
     ports:
       - "3306:3306"
     volumes:
       - ${MYSQL_CONF_PATH}/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
-      - ${MYSQL_CONF_PATH}/:/var/lib/mysql/:rw
+      - ${MYSQL_DATA_PATH}/:/var/lib/mysql/:rw
     networks:
       - net-mysql
     environment:
       MYSQL_ROOT_PASSWORD: "123456"
+    expose: 
+      - "3306"
+    container_name: "web_mysql"
 
   redis:
     image: redis:4.0
@@ -45,6 +56,9 @@ services:
       - net-redis
     ports:
       - "6379:6379"
+    expose: 
+      - "6379"
+    container_name: "web_redis"
 networks:
   net-php:
   net-mysql:
